@@ -20,8 +20,8 @@ export class RecipeFormComponent {
 
   recipeForm = this.fb.group({
     title: ['', Validators.required],
-    description: ['', Validators.required],
-    duration: ['', [Validators.required, Validators.min(1)]],
+    description: [''],
+    duration: ['', [Validators.min(1)]],
     image: ['', Validators.required],
     ingredients: this.fb.array([
       this.fb.group({
