@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Recipe } from './recipe.model';
-import { BehaviorSubject, Observable, debounceTime, finalize, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, delay, finalize, switchMap } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LoadingService } from './loading.service';
 import { environment } from './../environments/environment';
@@ -20,6 +20,7 @@ export class RecipeService {
   getRecipes(): Observable<Recipe[]> {
     this.loadingService.loading();
     return this.searchTerm$.pipe(
+      delay(500),
       debounceTime(100),
       switchMap( (term) => {
         return this.http.get<Recipe[]>(`${this.baseUrl}recipes?searchTerm=${term}`).pipe(
@@ -28,8 +29,8 @@ export class RecipeService {
     ),
   )}
 
-  getRecipeById<T>(id: number) {
-    return this.http.get<T>(`${this.baseUrl}recipes/${id}`)
+  getRecipeById<Recipe>(id: number): Observable<Recipe> {
+    return this.http.get<Recipe>(`${this.baseUrl}recipes/${id}`)
   }
 
   addPost(recipe: Recipe): Observable<Recipe> {

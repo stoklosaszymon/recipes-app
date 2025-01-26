@@ -7,15 +7,21 @@ import { Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoadingService } from '../loading.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { RecipeLoadingTempComponent } from "../recipe-loading-temp/recipe-loading-temp.component";
 
 @Component({
   selector: 'app-recipe-list',
-  imports: [RecipeCardComponent, SearchBarComponent, MatProgressSpinnerModule],
+  imports: [RecipeCardComponent, SearchBarComponent, MatProgressSpinnerModule, RecipeLoadingTempComponent, AsyncPipe],
   template: `
     <div class="m-4">
       <app-search-bar/>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 relative">
+      @if(loading$ | async) {
+        @for( recipe of [].constructor(6); track recipe) {
+          <app-recipe-loading-temp></app-recipe-loading-temp>
+        }
+      } @else {
          @for( recipe of recipes() ; track recipe.id) {
            <div class="cursor-pointer" (click)="goToRecipe(recipe.id)">
              <app-recipe-card [recipe]="recipe"></app-recipe-card>
@@ -31,6 +37,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
              </p>
            </div>
          }
+      }
     </div>
   `,
   styles: [``],
@@ -39,7 +46,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class RecipeListComponent {
 
   recipeService = inject(RecipeService)
+  loadingService = inject(LoadingService);
   router = inject(Router);
+  loading$ = this.loadingService.loading$;
 
   recipes = toSignal(this.recipeService.getRecipes());
 

@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    recipeApi: "http://localhost:8080/"
+    recipeApi: "https://recipes-api-kz.fly.dev/"
 };

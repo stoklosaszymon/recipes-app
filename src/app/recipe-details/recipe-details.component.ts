@@ -1,9 +1,10 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs';
 import { RecipeService } from '../recipe.service';
 import { Recipe } from '../recipe.model';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
 interface Ingredient {
   name: string;
@@ -22,17 +23,22 @@ interface Step {
 })
 export class RecipeDetailComponent {
   route = inject(ActivatedRoute);
+  router = inject(Router);
   recipeService = inject(RecipeService)
-  recipeId = this.route.paramMap.pipe(
+  recipeId = toSignal<number>(this.route.paramMap.pipe(
     map(params => {
       let id = params.get('id');
-      return id ?? ''
+      return Number(id) ?? 0
     }),
-  )
+  ));
 
-  recipe$ = this.recipeId.pipe(
-    switchMap( (id: string) => {
-      return this.recipeService.getRecipeById<Recipe>(parseInt(id))
+  recipe$ = toObservable(this.recipeId).pipe(
+    switchMap( (id) => {
+      return this.recipeService.getRecipeById<Recipe>(Number(id))
     })
   )
+
+  editRecipe() {
+    this.router.navigate([`recipe/${this.recipeId}/edit`])
+  }
 }

@@ -5,7 +5,6 @@ import { SingleInputComponent } from "../single-input/single-input.component";
 import { RecipeService } from '../recipe.service';
 import { Router } from '@angular/router';
 import { Recipe } from '../recipe.model';
-import { map, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-recipe-new',

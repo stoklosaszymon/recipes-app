@@ -5,6 +5,7 @@ import { RecipeNewComponent } from './recipe-new/recipe-new.component';
 
 export const routes: Routes = [
     { path: 'recipe/:id', component: RecipeDetailComponent },
+    { path: 'recipe/:id/edit', component: RecipeNewComponent },
     { path: 'recipes', component: RecipeListComponent },
     { path: 'new', component: RecipeNewComponent },
     { path: '', redirectTo: 'recipes', pathMatch: 'full' },

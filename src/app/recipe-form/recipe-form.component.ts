@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RecipeService } from '../recipe.service';
 import { Recipe } from '../recipe.model';
 import { Router } from '@angular/router';
+import { LoadingService } from '../loading.service';
 
 @Component({
   selector: 'app-recipe-form',
@@ -16,6 +17,7 @@ export class RecipeFormComponent {
 
   fb = inject(FormBuilder);
   recipeService = inject(RecipeService);
+  loadingService = inject(LoadingService);
   router = inject(Router);
 
   recipeForm = this.fb.group({
@@ -69,9 +71,9 @@ export class RecipeFormComponent {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-          const result = reader.result?.toString() || null;
-          this.recipeForm.get('image')?.setValue(result)
-      }; 
+        const result = reader.result?.toString() || null;
+        this.recipeForm.get('image')?.setValue(result)
+      };
     } else {
       console.log('ni ma filesa');
     }
@@ -80,12 +82,14 @@ export class RecipeFormComponent {
   onSubmit() {
     if (this.recipeForm.valid) {
       console.log(this.recipeForm.value);
-      
+      this.loadingService.loading();
       this.recipeService.addPost(this.recipeForm.value as Recipe)
-      .subscribe({
-        next: (value: Recipe) => this.router.navigate([`/recipe/${value.id}`])
-      },
-      )
+        .subscribe({
+          next: (value: Recipe) => {
+            this.loadingService.done();
+            this.router.navigate([`/recipe/${value.id}`])
+          }
+        })
     }
   }
 }
