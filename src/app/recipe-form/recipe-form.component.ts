@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject, input, output } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { RecipeService } from '../recipe.service';
@@ -19,11 +19,35 @@ export class RecipeFormComponent {
   recipeService = inject(RecipeService);
   loadingService = inject(LoadingService);
   router = inject(Router);
+  recipe = input<Recipe>();
+  formResult = output<any>();
+
+  recipeEffect = effect( () => {
+    if (this.recipe() ) {
+      this.recipeForm.patchValue({
+        title: this.recipe()?.title,
+        description: this.recipe()?.description,
+        cookingTime: this.recipe()?.cookingTime,
+        image: this.recipe()?.image, 
+      });
+
+      this.recipeForm.controls.ingredients.clear();
+      this.recipe()?.ingredients?.forEach( (ingredient) =>{
+        this.addIngredient(ingredient.name, ingredient.amount)
+      })
+
+      this.recipeForm.controls.steps.clear();
+      this.recipe()?.steps?.forEach( (step) =>{
+        this.addStep(step)
+      })
+
+    }
+  })
 
   recipeForm = this.fb.group({
     title: ['', Validators.required],
     description: [''],
-    duration: ['', [Validators.min(1)]],
+    cookingTime: [0, [Validators.min(1)]],
     image: ['', Validators.required],
     ingredients: this.fb.array([
       this.fb.group({
@@ -44,10 +68,10 @@ export class RecipeFormComponent {
     return this.recipeForm.get('steps') as FormArray;
   }
 
-  addIngredient() {
+  addIngredient(name: string = '', amount: string = '') {
     this.ingredients.push(this.fb.group({
-      name: ['', Validators.required],
-      amount: ['', Validators.required]
+      name: [name, Validators.required],
+      amount: [amount, Validators.required]
     }));
   }
 
@@ -55,8 +79,8 @@ export class RecipeFormComponent {
     this.ingredients.removeAt(index);
   }
 
-  addStep() {
-    this.steps.push(this.fb.control('', Validators.required));
+  addStep(step: string = '') {
+    this.steps.push(this.fb.control(step, Validators.required));
   }
 
   removeStep(index: number) {
@@ -81,15 +105,8 @@ export class RecipeFormComponent {
 
   onSubmit() {
     if (this.recipeForm.valid) {
-      console.log(this.recipeForm.value);
-      this.loadingService.loading();
-      this.recipeService.addPost(this.recipeForm.value as Recipe)
-        .subscribe({
-          next: (value: Recipe) => {
-            this.loadingService.done();
-            this.router.navigate([`/recipe/${value.id}`])
-          }
-        })
+      console.log('emiting')
+      this.formResult.emit(this.recipeForm.value);
     }
   }
 }

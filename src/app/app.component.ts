@@ -19,6 +19,6 @@ export class AppComponent {
   loadingService = inject(LoadingService);
 
   loading$ = this.loadingService.loading$.pipe(
-    map( () => this.router.url === '/recipes' ? false : true )
+    map( (result) => this.router.url === '/recipes' ? false : result )
   );
 }

@@ -1,7 +1,7 @@
 <mat-tab-group dynamicHeight="false">
     <mat-tab label="Recipe Form">
         <div class="overflow-hidden">
-            <app-recipe-form></app-recipe-form>
+            <app-recipe-form (formResult)="saveRecipe($event)"></app-recipe-form>
         </div>
     </mat-tab>
     <mat-tab label="From YouTube">

@@ -5,6 +5,7 @@ import { SingleInputComponent } from "../single-input/single-input.component";
 import { RecipeService } from '../recipe.service';
 import { Router } from '@angular/router';
 import { Recipe } from '../recipe.model';
+import { LoadingService } from '../loading.service';
 
 @Component({
   selector: 'app-recipe-new',
@@ -15,16 +16,26 @@ import { Recipe } from '../recipe.model';
 export class RecipeNewComponent {
 
   recipeService = inject(RecipeService);
+  loadingService = inject(LoadingService);
   router = inject(Router)
 
   handleOutput(value: any) {
     const url = value;
     this.recipeService.postFromUrl(url)
-     .subscribe({
+      .subscribe({
         next: (recipe: Recipe) => {
-          console.log('recipe', recipe)
-          console.log('type', typeof recipe)
           this.router.navigate([`/recipe/${recipe.id}`])
+        }
+      })
+  }
+
+  saveRecipe(recipeForm: any) {
+    this.loadingService.loading();
+    this.recipeService.addPost(recipeForm as Recipe)
+      .subscribe({
+        next: (value: Recipe) => {
+          this.loadingService.done();
+          this.router.navigate([`/recipe/${value.id}`])
         }
       })
   }

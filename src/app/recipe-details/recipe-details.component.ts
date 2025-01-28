@@ -39,6 +39,6 @@ export class RecipeDetailComponent {
   )
 
   editRecipe() {
-    this.router.navigate([`recipe/${this.recipeId}/edit`])
+    this.router.navigate([`recipe/${this.recipeId()}/edit`])
   }
 }

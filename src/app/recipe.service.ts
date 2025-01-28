@@ -20,14 +20,21 @@ export class RecipeService {
   getRecipes(): Observable<Recipe[]> {
     this.loadingService.loading();
     return this.searchTerm$.pipe(
-      delay(500),
       debounceTime(100),
-      switchMap( (term) => {
+      switchMap((term) => {
         return this.http.get<Recipe[]>(`${this.baseUrl}recipes?searchTerm=${term}`).pipe(
-          finalize( () => this.loadingService.done())
-      )}
-    ),
-  )}
+          finalize(() => this.loadingService.done())
+        )
+      }
+      ),
+    )
+  }
+
+  editPost(recipe: Recipe): Observable<Recipe> {
+    return this.http.post<Recipe>(`${this.baseUrl}recipes/${recipe.id}/edit`, recipe).pipe(
+      finalize(() => this.loadingService.done())
+    )
+  }
 
   getRecipeById<Recipe>(id: number): Observable<Recipe> {
     return this.http.get<Recipe>(`${this.baseUrl}recipes/${id}`)
@@ -39,8 +46,8 @@ export class RecipeService {
 
   postFromUrl(url: string) {
     this.loadingService.loading();
-    return this.http.get<Recipe>(`${this.baseUrl}recipes/fromUrl?url=${url}`, {headers: this.headers} ).pipe(
-      finalize( () => this.loadingService.done())
+    return this.http.get<Recipe>(`${this.baseUrl}recipes/fromUrl?url=${url}`, { headers: this.headers }).pipe(
+      finalize(() => this.loadingService.done())
     )
   }
 
