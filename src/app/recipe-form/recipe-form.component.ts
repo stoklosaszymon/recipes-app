@@ -21,6 +21,7 @@ export class RecipeFormComponent {
   router = inject(Router);
   recipe = input<Recipe>();
   formResult = output<any>();
+  editMode= input(false);
 
   recipeEffect = effect( () => {
     if (this.recipe() ) {
@@ -52,7 +53,7 @@ export class RecipeFormComponent {
     ingredients: this.fb.array([
       this.fb.group({
         name: ['', Validators.required],
-        amount: ['', Validators.required]
+        amount: ['']
       })
     ]),
     steps: this.fb.array([
@@ -71,7 +72,7 @@ export class RecipeFormComponent {
   addIngredient(name: string = '', amount: string = '') {
     this.ingredients.push(this.fb.group({
       name: [name, Validators.required],
-      amount: [amount, Validators.required]
+      amount: [amount]
     }));
   }
 
@@ -104,6 +105,7 @@ export class RecipeFormComponent {
   }
 
   onSubmit() {
+    console.log('submit');
     if (this.recipeForm.valid) {
       console.log('emiting')
       this.formResult.emit(this.recipeForm.value);

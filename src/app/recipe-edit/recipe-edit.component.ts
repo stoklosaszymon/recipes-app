@@ -29,6 +29,7 @@ export class RecipeEditComponent {
   recipe = toSignal<Recipe>(this.recipeService.getRecipeById(this.recipeId()!))
 
   editRecipe(recipeForm: any) {
+    console.log(recipeForm); 
     const recipe = { ...recipeForm, id: this.recipeId()};
     this.loadingService.loading();
     this.recipeService.editPost(recipe as Recipe)
@@ -36,6 +37,16 @@ export class RecipeEditComponent {
         next: (value: Recipe) => {
           this.loadingService.done();
           this.router.navigate([`/recipe/${value.id}`])
+        }
+      })
+  }
+
+  delete() {
+    this.recipeService.deleteRecipe(this.recipeId()!)
+      .subscribe({
+        next: (value: Recipe) => {
+          this.loadingService.done();
+          this.router.navigate([`/recipes`])
         }
       })
   }

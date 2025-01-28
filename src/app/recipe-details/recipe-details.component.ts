@@ -1,7 +1,7 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, map, switchMap } from 'rxjs';
+import { filter, map, switchMap, tap } from 'rxjs';
 import { RecipeService } from '../recipe.service';
 import { Recipe } from '../recipe.model';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -34,7 +34,9 @@ export class RecipeDetailComponent {
 
   recipe$ = toObservable(this.recipeId).pipe(
     switchMap( (id) => {
-      return this.recipeService.getRecipeById<Recipe>(Number(id))
+      return this.recipeService.getRecipeById<Recipe>(Number(id)).pipe(
+        tap( (res) => console.log(res))
+      )
     })
   )
 

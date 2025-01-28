@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Recipe } from './recipe.model';
-import { BehaviorSubject, Observable, debounceTime, delay, finalize, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, delay, finalize, switchMap, tap } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LoadingService } from './loading.service';
 import { environment } from './../environments/environment';
@@ -37,7 +37,10 @@ export class RecipeService {
   }
 
   getRecipeById<Recipe>(id: number): Observable<Recipe> {
-    return this.http.get<Recipe>(`${this.baseUrl}recipes/${id}`)
+    return this.http.get<Recipe>(`${this.baseUrl}recipes/${id}`).pipe(
+      tap( (rep)=> console.log(rep)
+      )
+    )
   }
 
   addPost(recipe: Recipe): Observable<Recipe> {
@@ -47,6 +50,12 @@ export class RecipeService {
   postFromUrl(url: string) {
     this.loadingService.loading();
     return this.http.get<Recipe>(`${this.baseUrl}recipes/fromUrl?url=${url}`, { headers: this.headers }).pipe(
+      finalize(() => this.loadingService.done())
+    )
+  }
+
+  deleteRecipe(id: number) {
+    return this.http.delete<Recipe>(`${this.baseUrl}recipes/${id}`).pipe(
       finalize(() => this.loadingService.done())
     )
   }
